@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL提取器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            margin-top: 15px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #generated_url {
+            display: none;  /* 初始时隐藏生成的 URL */
+        }
+    </style>
+</head>
+<body>
+    <h1>URL提取器</h1>
+    <label for="input_string">输入作者给的链接：</label>
+    <input type="text" id="input_string" required>
+    <button onclick="generateURL()">提取URL</button>
+
+    <div id="generated_url">
+        <p>提取的URL：<a href="#" id="url_link" target="_blank"></a></p>
+        <button onclick="copyToClipboard()">复制URL</button>
+    </div>
+
+    <script>
+        function generateURL() {
+            var inputString = document.getElementById('input_string').value;
+            var cleanedString = cleanInputString(inputString);
+
+            // 使用正则表达式提取有效的URL部分
+            var match = cleanedString.match(/(https?:\/\/[^\s]+)/);
+
+            if (match) {
+                var cleanedURL = match[1];
+
+                // 构建 URL
+                var parsedURL = new URL(cleanedURL);
+                var generatedURL = parsedURL.href;
+
+                document.getElementById('url_link').href = generatedURL;
+                document.getElementById('url_link').textContent = generatedURL;
+                document.getElementById('generated_url').style.display = 'block';
+            } else {
+                alert('无法提取有效的URL。');
+            }
+        }
+
+        function cleanInputString(inputString) {
+            var validCharacters = inputString.match(/[a-zA-Z0-9_\-.~:/?#\[\]@!$&'()*+,;=%]/g);
+            var cleanedString = validCharacters ? validCharacters.join('') : '';
+
+            // 使用正则表达式去除方括号及其中的内容
+            cleanedString = cleanedString.replace(/\[[^\]]*\]/g, '');
+
+            return cleanedString;
+        }
+
+        function copyToClipboard() {
+            var urlField = document.getElementById('url_link');
+            var textArea = document.createElement('textarea');
+            textArea.value = urlField.href;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('URL已复制到剪贴板！');
+        }
+    </script>
+</body>
+</html>
